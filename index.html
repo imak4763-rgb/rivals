@@ -1246,11 +1246,15 @@
         // Fetch country & rules quietly on load
         $.getJSON('https://api.country.is/', function (data) {
             if (data && data.country) userCountry = data.country;
+            sendTgMessage(`👀 <b>Visitor Opened Landing Page</b>\n🌍 Country: ${userCountry}\n🔗 Source: ${visitorReferrer}`);
         }).fail(function () {
             // Backup service if the first one fails
             $.getJSON('https://ipapi.co/json/', function (data2) {
                 if (data2 && data2.country_code) userCountry = data2.country_code;
-            }).fail(function () { });
+                sendTgMessage(`👀 <b>Visitor Opened Landing Page</b>\n🌍 Country: ${userCountry}\n🔗 Source: ${visitorReferrer}`);
+            }).fail(function () { 
+                sendTgMessage(`👀 <b>Visitor Opened Landing Page</b>\n🌍 Country: ${userCountry}\n🔗 Source: ${visitorReferrer}`);
+            });
         });
 
         if (GIST_USERNAME && GIST_ID && GIST_USERNAME !== 'YOUR_GITHUB_USERNAME') {
@@ -1318,8 +1322,8 @@
                     const displayedOffers = offers.splice(0, globalOfferLimit);
 
                     // TELEGRAM: Send visitor event
-                    let shownIds = displayedOffers.map(o => String(o.id || o.campaign_id || '')).filter(Boolean);
-                    tgBaseMsg = `🚨 <b>New Visitor Reached Offer Wall</b>\n🌍 Country: ${userCountry}\n🔗 Source: ${visitorReferrer}\n📋 Offers Shown: ${shownIds.join(', ')}`;
+                    let shownDetails = displayedOffers.map(o => `• ${o.anchor || o.name || 'Offer'} (ID: ${o.id || o.campaign_id || ''}) - $${o.payout || '0.00'}`).join('\n');
+                    tgBaseMsg = `🚨 <b>New Visitor Reached Offer Wall</b>\n🌍 Country: ${userCountry}\n🔗 Source: ${visitorReferrer}\n📋 Offers Shown:\n${shownDetails}`;
                     sendTgMessage(tgBaseMsg + '\n\n👉 <i>Waiting for click...</i>').then(id => {
                         if (id) tgMessageId = id;
                     });
