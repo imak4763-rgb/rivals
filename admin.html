@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rivals Admin - Offer Boost Controller</title>
+    <script src="https://cdn.tailwindcss.com/"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <style>
+        :root {
+            --bg-dark: #0F172A;
+            --card-bg: #1E293B;
+            --primary-gradient: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+            --button-gradient: linear-gradient(135deg, #4ade80 0%, #10b981 100%);
+        }
+        body { font-family: 'Poppins', sans-serif; background-color: var(--bg-dark); color: #fff; min-height: 100vh; }
+        .font-gaming { font-family: 'Rajdhani', sans-serif; text-transform: uppercase; }
+        .neon-text-purple { background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .gaming-card { background-color: var(--card-bg); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 1rem; }
+        .gaming-input { background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255, 255, 255, 0.1); color: #fff; }
+        .gaming-input:focus { border-color: #6366f1; outline: none; }
+        .btn-primary { background: var(--button-gradient); color: #000; font-weight: bold; }
+        .btn-secondary { background: rgba(99, 102, 241, 0.2); border: 1px solid #6366f1; color: #fff; }
+        #auth-screen { display: flex; }
+        #dashboard { display: none; }
+        /* Badge */
+        .boost-badge { background: #eab308; color: #000; font-size: 0.6rem; padding: 2px 6px; border-radius: 4px; font-weight: bold; }
+        
+        /* Select2 Dark Theme Adjustments */
+        .select2-container--default .select2-selection--single { background-color: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255, 255, 255, 0.1); height: 42px; border-radius: 0.5rem; }
+        .select2-container--default .select2-selection--single .select2-selection__rendered { color: #fff; line-height: 42px; padding-left: 12px; }
+        .select2-container--default .select2-selection--single .select2-selection__arrow { height: 40px; }
+        .select2-dropdown { background-color: #1E293B; border: 1px solid rgba(255, 255, 255, 0.1); color: #fff; }
+        .select2-search input { background-color: #0F172A !important; color: #fff !important; border: 1px solid rgba(255, 255, 255, 0.1) !important; }
+        .select2-results__option--selected { background-color: #4ade80 !important; color: #000 !important; }
+        .select2-results__option--highlighted { background-color: #6366f1 !important; color: #fff !important; }
+    </style>
+</head>
+<body class="p-6">
+
+    <!-- Auth Screen -->
+    <div id="auth-screen" class="fixed inset-0 flex flex-col items-center justify-center bg-[#0F172A] z-50">
+        <h1 class="font-gaming text-4xl neon-text-purple mb-8">ADMIN PORTAL</h1>
+        <div class="gaming-card p-8 w-full max-w-sm text-center">
+            <input type="password" id="admin-pass" placeholder="PASSWORD..." class="w-full gaming-input rounded-xl px-4 py-3 mb-4 font-gaming tracking-wider text-center">
+            <button id="login-btn" class="w-full btn-primary py-3 rounded-xl font-gaming tracking-widest">ACCESS</button>
+            <p id="login-error" class="text-rose-500 text-xs font-bold mt-4 hidden">INVALID CREDENTIALS</p>
+        </div>
+    </div>
+
+    <!-- Dashboard -->
+    <div id="dashboard" class="max-w-6xl mx-auto flex flex-col lg:flex-row gap-6 h-full">
+        <!-- Main Content -->
+        <div class="flex-1 flex flex-col gap-6">
+            <div class="flex justify-between items-center bg-[#1E293B] p-6 rounded-2xl border border-white/10 flex-wrap gap-4">
+                <div>
+                    <h1 class="font-gaming text-3xl neon-text-purple">OFFER BOOST RULES</h1>
+                    <p class="text-slate-400 text-sm">Pin specific offers to the top based on Country and Device.</p>
+                </div>
+                <div class="flex items-center gap-4">
+                    <div class="flex flex-col items-end">
+                        <label class="text-[10px] text-slate-400 uppercase font-bold mb-1">Max Offers to Show</label>
+                        <input type="number" id="offer-limit" value="10" min="1" max="50" class="w-20 bg-[#0F172A] border border-white/10 text-white font-bold rounded px-2 py-2 text-center focus:border-indigo-500 outline-none">
+                    </div>
+                    <button onclick="saveRules()" class="btn-primary px-6 py-2 rounded-xl font-gaming tracking-widest text-lg shadow-[0_0_15px_rgba(74,222,128,0.3)] mt-4">SAVE CONFIG</button>
+                </div>
+            </div>
+
+            <!-- Add Rule -->
+            <div class="gaming-card p-6">
+                <h2 class="font-gaming text-xl mb-4 text-indigo-400">ADD NEW RULE</h2>
+                <div class="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
+                    <div>
+                        <label class="text-xs text-slate-400 uppercase font-bold mb-1 block">Offer ID</label>
+                        <input type="text" id="new-offer-id" placeholder="e.g. 12345" class="w-full gaming-input rounded-lg px-3 py-2">
+                    </div>
+                    <div>
+                        <label class="text-xs text-slate-400 uppercase font-bold mb-1 block">Country</label>
+                        <select id="new-country" class="w-full gaming-input rounded-lg px-3 py-2">
+                        </select>
+                    </div>
+                    <div>
+                        <label class="text-xs text-slate-400 uppercase font-bold mb-1 block">Device</label>
+                        <select id="new-device" class="w-full gaming-input rounded-lg px-3 py-2">
+                            <option value="ALL">All Devices</option>
+                            <option value="ios">iOS</option>
+                            <option value="android">Android</option>
+                            <option value="pc">PC / Mac</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="text-xs text-slate-400 uppercase font-bold mb-1 block">Priority (1-10)</label>
+                        <input type="number" id="new-priority" value="5" min="1" max="10" class="w-full gaming-input rounded-lg px-3 py-2">
+                    </div>
+                    <button onclick="addRule()" class="btn-secondary py-2 rounded-lg font-bold">ADD RULE</button>
+                </div>
+            </div>
+
+            <!-- Rules List -->
+            <div class="gaming-card p-6 flex-1">
+                <h2 class="font-gaming text-xl mb-4 text-indigo-400">ACTIVE RULES</h2>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="border-b border-white/10 text-slate-400 text-xs uppercase">
+                                <th class="py-3 px-4">Offer ID</th>
+                                <th class="py-3 px-4">Country</th>
+                                <th class="py-3 px-4">Device</th>
+                                <th class="py-3 px-4">Priority</th>
+                                <th class="py-3 px-4 text-right">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="rules-tbody" class="text-sm">
+                            <!-- Rules injected here -->
+                        </tbody>
+                    </table>
+                    <div id="no-rules-msg" class="text-center text-slate-500 py-8 hidden">No rules configured.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar (GitHub Gist Setup & Live Preview) -->
+        <div class="w-full lg:w-80 flex flex-col gap-6">
+            <div class="gaming-card p-6 border-indigo-500/30 border">
+                <h2 class="font-gaming text-xl mb-4 text-indigo-400">GITHUB GIST SETTINGS</h2>
+                <p class="text-xs text-slate-400 mb-4">Required to save config for the live site.</p>
+                <div class="space-y-3">
+                    <div>
+                        <label class="text-[10px] text-slate-400 uppercase font-bold block mb-1">Gist ID</label>
+                        <input type="text" id="gist-id" class="w-full gaming-input rounded-md px-3 py-1.5 text-xs">
+                    </div>
+                    <div>
+                        <label class="text-[10px] text-slate-400 uppercase font-bold block mb-1">GitHub Token</label>
+                        <input type="password" id="github-token" class="w-full gaming-input rounded-md px-3 py-1.5 text-xs">
+                    </div>
+                    <button onclick="saveSettings()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold py-2 rounded">SAVE KEYS LOCALLY</button>
+                </div>
+            </div>
+
+            <div class="gaming-card p-6 flex-1 flex flex-col max-h-[600px]">
+                <h2 class="font-gaming text-xl mb-4 text-emerald-400">LIVE OFFER FEED</h2>
+                <p class="text-xs text-slate-400 mb-4">Click an ID to copy it.</p>
+                <div id="live-offers" class="flex-1 overflow-y-auto space-y-3 pr-2 scrollbar-thin">
+                    <div class="text-center py-4 text-slate-500 text-sm">Loading feed...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div id="toast" class="fixed bottom-4 right-4 bg-emerald-600 text-white px-4 py-2 rounded shadow-lg transition-opacity duration-300 opacity-0 pointer-events-none z-50">Saved successfully!</div>
+
+    <script>
+        // SHA-256 Hash of 'rivals2026'
+        const PASS_HASH = 'c661ef9cf56af25df6309645bf4f42586b1acb777ad042870d1a64335798fdbe';
+        let rules = [];
+        let globalOfferLimit = 10;
+
+        // Populate Countries with Select2
+        const countriesList = [{"code":"ALL","name":"All Countries"},{"code":"AF","name":"Afghanistan"},{"code":"AL","name":"Albania"},{"code":"DZ","name":"Algeria"},{"code":"AS","name":"American Samoa"},{"code":"AD","name":"Andorra"},{"code":"AO","name":"Angola"},{"code":"AI","name":"Anguilla"},{"code":"AQ","name":"Antarctica"},{"code":"AG","name":"Antigua and Barbuda"},{"code":"AR","name":"Argentina"},{"code":"AM","name":"Armenia"},{"code":"AW","name":"Aruba"},{"code":"AU","name":"Australia"},{"code":"AT","name":"Austria"},{"code":"AZ","name":"Azerbaijan"},{"code":"BS","name":"Bahamas"},{"code":"BH","name":"Bahrain"},{"code":"BD","name":"Bangladesh"},{"code":"BB","name":"Barbados"},{"code":"BY","name":"Belarus"},{"code":"BE","name":"Belgium"},{"code":"BZ","name":"Belize"},{"code":"BJ","name":"Benin"},{"code":"BM","name":"Bermuda"},{"code":"BT","name":"Bhutan"},{"code":"BO","name":"Bolivia"},{"code":"BA","name":"Bosnia and Herzegovina"},{"code":"BW","name":"Botswana"},{"code":"BR","name":"Brazil"},{"code":"IO","name":"British Indian Ocean Territory"},{"code":"BN","name":"Brunei Darussalam"},{"code":"BG","name":"Bulgaria"},{"code":"BF","name":"Burkina Faso"},{"code":"BI","name":"Burundi"},{"code":"KH","name":"Cambodia"},{"code":"CM","name":"Cameroon"},{"code":"CA","name":"Canada"},{"code":"CV","name":"Cape Verde"},{"code":"KY","name":"Cayman Islands"},{"code":"CF","name":"Central African Republic"},{"code":"TD","name":"Chad"},{"code":"CL","name":"Chile"},{"code":"CN","name":"China"},{"code":"CX","name":"Christmas Island"},{"code":"CC","name":"Cocos (Keeling) Islands"},{"code":"CO","name":"Colombia"},{"code":"KM","name":"Comoros"},{"code":"CG","name":"Congo"},{"code":"CD","name":"Congo, Democratic Republic"},{"code":"CK","name":"Cook Islands"},{"code":"CR","name":"Costa Rica"},{"code":"CI","name":"Cote D'Ivoire"},{"code":"HR","name":"Croatia"},{"code":"CU","name":"Cuba"},{"code":"CY","name":"Cyprus"},{"code":"CZ","name":"Czech Republic"},{"code":"DK","name":"Denmark"},{"code":"DJ","name":"Djibouti"},{"code":"DM","name":"Dominica"},{"code":"DO","name":"Dominican Republic"},{"code":"EC","name":"Ecuador"},{"code":"EG","name":"Egypt"},{"code":"SV","name":"El Salvador"},{"code":"GQ","name":"Equatorial Guinea"},{"code":"ER","name":"Eritrea"},{"code":"EE","name":"Estonia"},{"code":"ET","name":"Ethiopia"},{"code":"FK","name":"Falkland Islands (Malvinas)"},{"code":"FO","name":"Faroe Islands"},{"code":"FJ","name":"Fiji"},{"code":"FI","name":"Finland"},{"code":"FR","name":"France"},{"code":"GF","name":"French Guiana"},{"code":"PF","name":"French Polynesia"},{"code":"TF","name":"French Southern Territories"},{"code":"GA","name":"Gabon"},{"code":"GM","name":"Gambia"},{"code":"GE","name":"Georgia"},{"code":"DE","name":"Germany"},{"code":"GH","name":"Ghana"},{"code":"GI","name":"Gibraltar"},{"code":"GR","name":"Greece"},{"code":"GL","name":"Greenland"},{"code":"GD","name":"Grenada"},{"code":"GP","name":"Guadeloupe"},{"code":"GU","name":"Guam"},{"code":"GT","name":"Guatemala"},{"code":"GN","name":"Guinea"},{"code":"GW","name":"Guinea-Bissau"},{"code":"GY","name":"Guyana"},{"code":"HT","name":"Haiti"},{"code":"VA","name":"Holy See (Vatican)"},{"code":"HN","name":"Honduras"},{"code":"HK","name":"Hong Kong"},{"code":"HU","name":"Hungary"},{"code":"IS","name":"Iceland"},{"code":"IN","name":"India"},{"code":"ID","name":"Indonesia"},{"code":"IR","name":"Iran"},{"code":"IQ","name":"Iraq"},{"code":"IE","name":"Ireland"},{"code":"IL","name":"Israel"},{"code":"IT","name":"Italy"},{"code":"JM","name":"Jamaica"},{"code":"JP","name":"Japan"},{"code":"JO","name":"Jordan"},{"code":"KZ","name":"Kazakhstan"},{"code":"KE","name":"Kenya"},{"code":"KI","name":"Kiribati"},{"code":"KP","name":"Korea, North"},{"code":"KR","name":"Korea, South"},{"code":"KW","name":"Kuwait"},{"code":"KG","name":"Kyrgyzstan"},{"code":"LA","name":"Laos"},{"code":"LV","name":"Latvia"},{"code":"LB","name":"Lebanon"},{"code":"LS","name":"Lesotho"},{"code":"LR","name":"Liberia"},{"code":"LY","name":"Libya"},{"code":"LI","name":"Liechtenstein"},{"code":"LT","name":"Lithuania"},{"code":"LU","name":"Luxembourg"},{"code":"MO","name":"Macau"},{"code":"MK","name":"Macedonia"},{"code":"MG","name":"Madagascar"},{"code":"MW","name":"Malawi"},{"code":"MY","name":"Malaysia"},{"code":"MV","name":"Maldives"},{"code":"ML","name":"Mali"},{"code":"MT","name":"Malta"},{"code":"MH","name":"Marshall Islands"},{"code":"MQ","name":"Martinique"},{"code":"MR","name":"Mauritania"},{"code":"MU","name":"Mauritius"},{"code":"YT","name":"Mayotte"},{"code":"MX","name":"Mexico"},{"code":"FM","name":"Micronesia"},{"code":"MD","name":"Moldova"},{"code":"MC","name":"Monaco"},{"code":"MN","name":"Mongolia"},{"code":"MS","name":"Montserrat"},{"code":"MA","name":"Morocco"},{"code":"MZ","name":"Mozambique"},{"code":"MM","name":"Myanmar"},{"code":"NA","name":"Namibia"},{"code":"NR","name":"Nauru"},{"code":"NP","name":"Nepal"},{"code":"NL","name":"Netherlands"},{"code":"AN","name":"Netherlands Antilles"},{"code":"NC","name":"New Caledonia"},{"code":"NZ","name":"New Zealand"},{"code":"NI","name":"Nicaragua"},{"code":"NE","name":"Niger"},{"code":"NG","name":"Nigeria"},{"code":"NU","name":"Niue"},{"code":"NF","name":"Norfolk Island"},{"code":"MP","name":"Northern Mariana Islands"},{"code":"NO","name":"Norway"},{"code":"OM","name":"Oman"},{"code":"PK","name":"Pakistan"},{"code":"PW","name":"Palau"},{"code":"PA","name":"Panama"},{"code":"PG","name":"Papua New Guinea"},{"code":"PY","name":"Paraguay"},{"code":"PE","name":"Peru"},{"code":"PH","name":"Philippines"},{"code":"PN","name":"Pitcairn"},{"code":"PL","name":"Poland"},{"code":"PT","name":"Portugal"},{"code":"PR","name":"Puerto Rico"},{"code":"QA","name":"Qatar"},{"code":"RE","name":"Reunion"},{"code":"RO","name":"Romania"},{"code":"RU","name":"Russian Federation"},{"code":"RW","name":"Rwanda"},{"code":"SH","name":"Saint Helena"},{"code":"KN","name":"Saint Kitts and Nevis"},{"code":"LC","name":"Saint Lucia"},{"code":"PM","name":"Saint Pierre and Miquelon"},{"code":"VC","name":"Saint Vincent and the Grenadines"},{"code":"WS","name":"Samoa"},{"code":"SM","name":"San Marino"},{"code":"ST","name":"Sao Tome and Principe"},{"code":"SA","name":"Saudi Arabia"},{"code":"SN","name":"Senegal"},{"code":"RS","name":"Serbia"},{"code":"SC","name":"Seychelles"},{"code":"SL","name":"Sierra Leone"},{"code":"SG","name":"Singapore"},{"code":"SK","name":"Slovakia"},{"code":"SI","name":"Slovenia"},{"code":"SB","name":"Solomon Islands"},{"code":"SO","name":"Somalia"},{"code":"ZA","name":"South Africa"},{"code":"GS","name":"South Georgia"},{"code":"ES","name":"Spain"},{"code":"LK","name":"Sri Lanka"},{"code":"SD","name":"Sudan"},{"code":"SR","name":"Suriname"},{"code":"SJ","name":"Svalbard and Jan Mayen"},{"code":"SZ","name":"Swaziland"},{"code":"SE","name":"Sweden"},{"code":"CH","name":"Switzerland"},{"code":"SY","name":"Syrian Arab Republic"},{"code":"TW","name":"Taiwan"},{"code":"TJ","name":"Tajikistan"},{"code":"TZ","name":"Tanzania"},{"code":"TH","name":"Thailand"},{"code":"TG","name":"Togo"},{"code":"TK","name":"Tokelau"},{"code":"TO","name":"Tonga"},{"code":"TT","name":"Trinidad and Tobago"},{"code":"TN","name":"Tunisia"},{"code":"TR","name":"Turkey"},{"code":"TM","name":"Turkmenistan"},{"code":"TC","name":"Turks and Caicos Islands"},{"code":"TV","name":"Tuvalu"},{"code":"UG","name":"Uganda"},{"code":"UA","name":"Ukraine"},{"code":"AE","name":"United Arab Emirates"},{"code":"GB","name":"United Kingdom"},{"code":"US","name":"United States"},{"code":"UM","name":"United States Minor Outlying Islands"},{"code":"UY","name":"Uruguay"},{"code":"UZ","name":"Uzbekistan"},{"code":"VU","name":"Vanuatu"},{"code":"VE","name":"Venezuela"},{"code":"VN","name":"Viet Nam"},{"code":"VG","name":"Virgin Islands, British"},{"code":"VI","name":"Virgin Islands, U.S"},{"code":"WF","name":"Wallis and Futuna"},{"code":"EH","name":"Western Sahara"},{"code":"YE","name":"Yemen"},{"code":"ZM","name":"Zambia"},{"code":"ZW","name":"Zimbabwe"}];
+        $(document).ready(function() {
+            const select = $('#new-country');
+            countriesList.forEach(c => select.append(new Option(c.name, c.code)));
+            select.select2({ width: '100%' });
+        });
+
+        // Auth
+        async function sha256(message) {
+            const msgBuffer = new TextEncoder().encode(message);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+
+        document.getElementById('login-btn').addEventListener('click', async () => {
+            const pass = document.getElementById('admin-pass').value;
+            const hash = await sha256(pass);
+            if (hash === PASS_HASH) {
+                document.getElementById('auth-screen').style.display = 'none';
+                document.getElementById('dashboard').style.display = 'flex';
+                initApp();
+            } else {
+                document.getElementById('login-error').classList.remove('hidden');
+            }
+        });
+        document.getElementById('admin-pass').addEventListener('keypress', (e) => { if (e.key === 'Enter') document.getElementById('login-btn').click(); });
+
+        // App Init
+        function initApp() {
+            // Load local settings
+            document.getElementById('gist-id').value = localStorage.getItem('gist_id') || '';
+            document.getElementById('github-token').value = localStorage.getItem('github_token') || '';
+            
+            fetchLiveOffers();
+            loadRules();
+        }
+
+        function saveSettings() {
+            localStorage.setItem('gist_id', document.getElementById('gist-id').value.trim());
+            localStorage.setItem('github_token', document.getElementById('github-token').value.trim());
+            showToast('API Keys saved locally!');
+            loadRules(); // Try to fetch with new keys
+        }
+
+        // Live Feed Preview
+        function fetchLiveOffers() {
+            // Using the API from the landing page
+            $.getJSON('https://d1cdbd1x576ga0.cloudfront.net/public/offers/feed.php?user_id=266306&api_key=ebc908434780141a17043a39dfcfe7dd&s1=&s2=&callback=?', function(offers) {
+                const container = document.getElementById('live-offers');
+                container.innerHTML = '';
+                if (!offers || offers.length === 0) {
+                    container.innerHTML = '<div class="text-xs text-slate-500 text-center">No offers available for your current IP.</div>';
+                    return;
+                }
+                offers.forEach(o => {
+                    // Extract ID from click_url or assume 'id' exists if API provides it
+                    // The standard OGAds/CPABuild feed usually has id or campaign_id.
+                    // If not, we extract from url.
+                    let offerId = o.id || o.campaign_id;
+                    if(!offerId && o.url) {
+                        const urlParams = new URLSearchParams(new URL(o.url).search);
+                        offerId = urlParams.get('id') || urlParams.get('c') || 'N/A';
+                    }
+                    
+                    container.innerHTML += `
+                        <div class="bg-white/5 p-3 rounded border border-white/10 hover:border-indigo-500/50 transition-colors">
+                            <div class="flex justify-between items-start mb-1">
+                                <span class="text-xs font-bold text-indigo-400 cursor-pointer hover:text-indigo-300" onclick="copyId('${offerId}')" title="Click to copy ID">ID: ${offerId}</span>
+                                <span class="text-[10px] bg-white/10 px-1.5 rounded">${o.epc ? 'EPC: $'+o.epc : 'Offer'}</span>
+                            </div>
+                            <p class="text-sm text-white line-clamp-1">${o.anchor}</p>
+                            <p class="text-xs text-slate-400 line-clamp-1">${o.conversion || 'Complete task'}</p>
+                        </div>
+                    `;
+                });
+            });
+        }
+
+        function copyId(id) {
+            navigator.clipboard.writeText(id);
+            document.getElementById('new-offer-id').value = id;
+            showToast(`Copied ID ${id}`);
+        }
+
+        // Rules Management
+        function renderRules() {
+            const tbody = document.getElementById('rules-tbody');
+            const noMsg = document.getElementById('no-rules-msg');
+            tbody.innerHTML = '';
+            
+            if (rules.length === 0) {
+                noMsg.classList.remove('hidden');
+            } else {
+                noMsg.classList.add('hidden');
+                rules.sort((a,b) => b.priority - a.priority).forEach((r, idx) => {
+                    tbody.innerHTML += `
+                        <tr class="border-b border-white/5 hover:bg-white/5">
+                            <td class="py-3 px-4 font-mono text-indigo-300">${r.offerId}</td>
+                            <td class="py-3 px-4"><span class="bg-white/10 px-2 py-1 rounded text-xs">${r.country}</span></td>
+                            <td class="py-3 px-4"><span class="bg-white/10 px-2 py-1 rounded text-xs">${r.device}</span></td>
+                            <td class="py-3 px-4">${r.priority}</td>
+                            <td class="py-3 px-4 text-right">
+                                <button onclick="deleteRule(${idx})" class="text-rose-500 hover:text-rose-400 text-xs font-bold uppercase tracking-wider">Remove</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+            }
+        }
+
+        function addRule() {
+            const id = document.getElementById('new-offer-id').value.trim();
+            const country = document.getElementById('new-country').value;
+            const device = document.getElementById('new-device').value;
+            const priority = parseInt(document.getElementById('new-priority').value) || 5;
+
+            if (!id) { alert('Enter an Offer ID'); return; }
+
+            rules.push({ offerId: id, country, device, priority });
+            renderRules();
+            
+            document.getElementById('new-offer-id').value = '';
+        }
+
+        function deleteRule(idx) {
+            rules.splice(idx, 1);
+            renderRules();
+        }
+
+        // GitHub Gist Integration
+        async function loadRules() {
+            const gistId = localStorage.getItem('gist_id');
+            const token = localStorage.getItem('github_token');
+            if (!gistId) return;
+
+            try {
+                const res = await fetch(`https://api.github.com/gists/${gistId}`, {
+                    headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data.files && data.files['config.json']) {
+                        const content = JSON.parse(data.files['config.json'].content);
+                        if (Array.isArray(content.rules)) rules = content.rules;
+                        if (content.offerLimit) {
+                            globalOfferLimit = content.offerLimit;
+                            document.getElementById('offer-limit').value = globalOfferLimit;
+                        }
+                        renderRules();
+                    }
+                }
+            } catch(e) { console.error('Failed to load rules', e); }
+        }
+
+        async function saveRules() {
+            const gistId = localStorage.getItem('gist_id');
+            const token = localStorage.getItem('github_token');
+            
+            if (!gistId || !token) {
+                alert('Please configure GitHub Gist settings on the right sidebar first.');
+                return;
+            }
+
+            const btn = event.target;
+            const oldText = btn.textContent;
+            btn.textContent = 'SAVING...';
+            btn.disabled = true;
+
+            const currentLimit = parseInt(document.getElementById('offer-limit').value) || 10;
+            try {
+                const payload = {
+                    description: "Updated offer boost rules",
+                    files: {
+                        "config.json": {
+                            content: JSON.stringify({ rules, offerLimit: currentLimit })
+                        }
+                    }
+                };
+                
+                const res = await fetch(`https://api.github.com/gists/${gistId}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Accept': 'application/vnd.github+json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                });
+                
+                if (res.ok) {
+                    showToast('Rules saved to GitHub Gist!');
+                } else {
+                    const err = await res.json();
+                    alert('Failed to save to GitHub. Check your Token.');
+                }
+            } catch(e) {
+                alert('Network error while saving.');
+            } finally {
+                btn.textContent = oldText;
+                btn.disabled = false;
+            }
+        }
+
+        // Utils
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.style.opacity = '1';
+            setTimeout(() => toast.style.opacity = '0', 3000);
+        }
+    </script>
+</body>
+</html>
