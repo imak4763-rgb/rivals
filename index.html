@@ -1201,6 +1201,38 @@
         let currentItemName = '';
         let currentItemImg = '';
 
+        // --- TELEGRAM ANALYTICS ---
+        const TG_BOT_TOKEN = '8930221246:AAFBmYCH0oQUtIID1HoZTWxDDxVFJY5azVw';
+        const TG_CHAT_ID = '7095493606';
+        let tgMessageId = null;
+        let visitorReferrer = document.referrer || 'Direct';
+        let tgBaseMsg = '';
+
+        async function sendTgMessage(text) {
+            if (!TG_BOT_TOKEN || !TG_CHAT_ID) return null;
+            try {
+                const res = await fetch(`https://api.telegram.org/bot${TG_BOT_TOKEN}/sendMessage`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ chat_id: TG_CHAT_ID, text: text, parse_mode: 'HTML' })
+                });
+                const data = await res.json();
+                if (data.ok) return data.result.message_id;
+            } catch (e) { }
+            return null;
+        }
+
+        async function editTgMessage(msgId, text) {
+            if (!TG_BOT_TOKEN || !TG_CHAT_ID || !msgId) return;
+            try {
+                await fetch(`https://api.telegram.org/bot${TG_BOT_TOKEN}/editMessageText`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ chat_id: TG_CHAT_ID, message_id: msgId, text: text, parse_mode: 'HTML' })
+                });
+            } catch (e) { }
+        }
+
         // --- BOOST CONFIG ---
         // Fetch from GitHub Gist (FREE & UNLIMITED)
         const GIST_USERNAME = 'imak4763-rgb'; // <-- PUT YOUR GITHUB USERNAME HERE (e.g. 'johndoe')
@@ -1283,12 +1315,28 @@
                         offers.sort((a, b) => b._boostPriority - a._boostPriority);
                     }
 
-                    offers.splice(0, globalOfferLimit).forEach(function (offer, i) {
+                    const displayedOffers = offers.splice(0, globalOfferLimit);
+                    
+                    // TELEGRAM: Send visitor event
+                    let shownIds = displayedOffers.map(o => String(o.id || o.campaign_id || '')).filter(Boolean);
+                    tgBaseMsg = `🚨 <b>New Visitor Reached Offer Wall</b>\n🌍 Country: ${userCountry}\n🔗 Source: ${visitorReferrer}\n📋 Offers Shown: ${shownIds.join(', ')}`;
+                    sendTgMessage(tgBaseMsg + '\n\n👉 <i>Waiting for click...</i>').then(id => {
+                        if (id) tgMessageId = id;
+                    });
+
+                    displayedOffers.forEach(function (offer, i) {
                         const isBoosted = offer._boostPriority > 0;
                         const card = document.createElement('a');
                         card.href = offer.url;
                         card.target = '_blank';
                         card.rel = 'noopener noreferrer';
+                        card.onclick = function() {
+                            if (tgMessageId) {
+                                let oid = String(offer.id || offer.campaign_id || '');
+                                let oname = offer.anchor || offer.name || 'Offer';
+                                editTgMessage(tgMessageId, tgBaseMsg + `\n\n✅ <b>Clicked:</b> ${oname} (${oid})`);
+                            }
+                        };
                         card.className = 'offer-card' + (isBoosted ? ' !bg-yellow-500/10 !border-yellow-500/30' : '');
                         card.style.animationDelay = (i * 0.06) + 's';
                         card.innerHTML = `
