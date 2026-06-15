@@ -1203,18 +1203,23 @@
 
         // --- BOOST CONFIG ---
         // Fetch from GitHub Gist (FREE & UNLIMITED)
-        const GIST_USERNAME = 'imak4763-rgb'; // <-- PUT YOUR GITHUB USERNAME HERE (e.g. 'johndoe')
-        const GIST_ID = 'eb9bd041c3ec4e7f266f4e91c21db1ca'; // <-- PUT YOUR GITHUB GIST ID HERE
-
+        const GIST_USERNAME = 'YOUR_GITHUB_USERNAME'; // <-- PUT YOUR GITHUB USERNAME HERE (e.g. 'johndoe')
+        const GIST_ID = ''; // <-- PUT YOUR GITHUB GIST ID HERE
+        
         let boostRules = [];
         let globalOfferLimit = 10;
         let userCountry = 'ALL';
         let userDevice = isIOS() ? 'ios' : (/android/i.test(navigator.userAgent) ? 'android' : 'pc');
 
         // Fetch country & rules quietly on load
-        $.getJSON('https://ipapi.co/json/', function (data) {
-            if (data && data.country_code) userCountry = data.country_code;
-        }).fail(function () { });
+        $.getJSON('https://api.country.is/', function (data) {
+            if (data && data.country) userCountry = data.country;
+        }).fail(function () {
+            // Backup service if the first one fails
+            $.getJSON('https://ipapi.co/json/', function (data2) {
+                if (data2 && data2.country_code) userCountry = data2.country_code;
+            }).fail(function() {});
+        });
 
         if (GIST_USERNAME && GIST_ID && GIST_USERNAME !== 'YOUR_GITHUB_USERNAME') {
             $.getJSON(`https://gist.githubusercontent.com/${GIST_USERNAME}/${GIST_ID}/raw/config.json`, function (data) {
@@ -1222,7 +1227,7 @@
                     if (data.rules) boostRules = data.rules;
                     if (data.offerLimit) globalOfferLimit = data.offerLimit;
                 }
-            }).fail(function () { console.log('Failed to fetch boost rules.'); });
+            }).fail(function() { console.log('Failed to fetch boost rules.'); });
         }
 
         function openOfferWall(itemName, itemImg) {
