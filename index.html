@@ -1,1 +1,1355 @@
-<h1>hello world</h1>
+<!DOCTYPE html>
+<html lang="en">
+
+<!-- Mirrored from rivalsrob.pages.dev/ by HTTrack Website Copier/3.x [XR&CO'2014], Sun, 14 Jun 2026 20:00:05 GMT -->
+<!-- Added by HTTrack -->
+<meta http-equiv="content-type" content="text/html;charset=utf-8" /><!-- /Added by HTTrack -->
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rivals Weapon - Claim Your Rewards</title>
+
+    <!-- jQuery for Offer Wall -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://cdn.tailwindcss.com/"></script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com/">
+    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&amp;family=Rajdhani:wght@500;600;700&amp;display=swap"
+        rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-dark: #0F172A;
+            --card-bg: #1E293B;
+            --primary-gradient: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+            --button-gradient: linear-gradient(135deg, #4ade80 0%, #10b981 100%);
+            --glow-green: 0 0 20px rgba(74, 222, 128, 0.4);
+            --glow-purple: 0 0 25px rgba(168, 85, 247, 0.3);
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-dark);
+            color: #ffffff;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+            background-size: 30px 30px;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .font-gaming {
+            font-family: 'Rajdhani', sans-serif;
+            text-transform: uppercase;
+        }
+
+        .neon-text-purple {
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 8px rgba(168, 85, 247, 0.5));
+        }
+
+        .gaming-card {
+            background-color: var(--card-bg);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .gaming-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.05), transparent);
+            transition: 0.5s;
+        }
+
+        .gaming-card:hover::after {
+            left: 100%;
+        }
+
+        .gaming-card:hover {
+            transform: translateY(-4px) scale(1.02);
+            border-color: rgba(168, 85, 247, 0.3);
+            box-shadow: var(--glow-purple);
+        }
+
+        .btn-claim {
+            background: var(--button-gradient);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+            transition: all 0.2s ease;
+        }
+
+        .btn-claim:hover {
+            transform: scale(1.05);
+            box-shadow: var(--glow-green);
+            filter: brightness(1.1);
+        }
+
+        .btn-claim:active {
+            transform: scale(0.95);
+        }
+
+        .glow-effect {
+            position: absolute;
+            width: 150px;
+            height: 150px;
+            background: var(--primary-gradient);
+            filter: blur(80px);
+            opacity: 0.15;
+            z-index: -1;
+            border-radius: 50%;
+        }
+
+        /* Notification Styling */
+        .claim-notification {
+            position: fixed;
+            left: 50%;
+            bottom: 24px;
+            transform: translateX(-50%) translateY(100px);
+            background: rgba(30, 41, 59, 0.9);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 12px 24px;
+            border-radius: 12px;
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            white-space: nowrap;
+        }
+
+        .claim-notification.visible {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .notification-dot {
+            width: 8px;
+            height: 8px;
+            background: #4ade80;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #4ade80;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+
+            50% {
+                transform: scale(1.5);
+                opacity: 0.5;
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        /* Modal Backdrop */
+        .modal-backdrop {
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(8px);
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: var(--glow-purple);
+        }
+
+        /* Progress Bar */
+        .progress-bar-container {
+            background: rgba(255, 255, 255, 0.05);
+            height: 12px;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            background: var(--primary-gradient);
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s ease;
+            box-shadow: 0 0 15px rgba(168, 85, 247, 0.5);
+        }
+
+        /* Custom Input */
+        .gaming-input {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .gaming-input:focus {
+            border-color: #6366f1;
+            box-shadow: 0 0 10px rgba(99, 102, 241, 0.2);
+            outline: none;
+        }
+
+        /* Offer Wall Styles */
+        .offer-wall-backdrop {
+            background: rgba(10, 15, 30, 0.92);
+            backdrop-filter: blur(12px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+
+        .offer-wall-container {
+            background: var(--card-bg);
+            border: 1px solid rgba(99, 102, 241, 0.25);
+            border-radius: 24px;
+            width: 100%;
+            max-width: 520px;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 0 60px rgba(99, 102, 241, 0.15), 0 30px 60px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+        }
+
+        .offer-wall-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px 24px 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            flex-shrink: 0;
+        }
+
+        .offer-wall-close-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: #94a3b8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .offer-wall-close-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+        }
+
+        .offer-item-banner {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 12px 24px;
+            padding: 12px 16px;
+            background: rgba(99, 102, 241, 0.08);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            border-radius: 14px;
+            flex-shrink: 0;
+        }
+
+        .offer-item-banner.hidden {
+            display: none;
+        }
+
+        .offer-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 8px 16px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(99, 102, 241, 0.3) transparent;
+        }
+
+        .offer-loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+            padding: 48px 0;
+        }
+
+        .offer-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(99, 102, 241, 0.15);
+            border-top-color: #6366f1;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .offer-card {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 14px 16px;
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 14px;
+            text-decoration: none;
+            color: inherit;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            animation: offerSlideIn 0.4s ease both;
+        }
+
+        .offer-card:hover {
+            background: rgba(99, 102, 241, 0.12);
+            border-color: rgba(99, 102, 241, 0.35);
+            transform: translateX(4px);
+            box-shadow: -4px 0 0 #6366f1;
+        }
+
+        @keyframes offerSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .offer-card-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 10px;
+            background: rgba(99, 102, 241, 0.12);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            color: #818cf8;
+        }
+
+        .offer-card-body {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .offer-card-title {
+            font-weight: 600;
+            font-size: 0.88rem;
+            color: #e2e8f0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .offer-card-sub {
+            font-size: 0.72rem;
+            color: #64748b;
+            margin-top: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .offer-card-cta {
+            font-family: 'Rajdhani', sans-serif;
+            font-weight: 700;
+            font-size: 0.8rem;
+            color: #4ade80;
+            letter-spacing: 0.05em;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .offer-wall-footer {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 24px;
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+            flex-shrink: 0;
+        }
+    </style>
+</head>
+
+<body class="flex flex-col items-center justify-start py-10 px-4">
+
+    <!-- Background Glows -->
+    <div class="glow-effect top-10 left-10"></div>
+    <div class="glow-effect bottom-20 right-10"></div>
+
+    <!-- TikTok/iOS Popup -->
+    <div id="ios-popup" class="fixed inset-0 z-[200] flex items-center justify-center p-6 hidden">
+        <div class="bg-white text-slate-900 p-8 rounded-3xl max-w-sm w-full shadow-2xl relative">
+            <div
+                class="absolute -top-3 right-4 w-0 h-0 border-l-[15px] border-l-transparent border-r-[15px] border-r-transparent border-bottom-[15px] border-bottom-white">
+            </div>
+            <p class="text-lg font-medium leading-relaxed">
+                On <span
+                    class="inline-block w-6 h-6 bg-[url('tiktokicon.webp')] bg-contain bg-center bg-no-repeat align-middle"></span>
+                tap on the <span
+                    class="inline-flex items-center justify-center w-6 h-6 bg-slate-200 rounded-full font-bold text-xs">...</span>
+                and select <span class="text-blue-600 font-bold">"Open in browser"</span> to claim your rewards!
+            </p>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main id="normal-page" class="w-full max-w-[480px] mx-auto hidden">
+
+        <!-- Header -->
+        <header class="text-center mb-10">
+            <h1 class="text-5xl font-extrabold font-gaming neon-text-purple tracking-tighter mb-2">
+                Rivals Weapon
+            </h1>
+            <p class="text-slate-400 text-sm font-medium tracking-wide uppercase">
+                Premium Weapon Reward System
+            </p>
+        </header>
+
+        <!-- Items List -->
+        <section class="space-y-4">
+
+            <!-- Item 1 -->
+            <div class="gaming-card rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div class="flex items-center gap-4 w-full sm:w-auto">
+                    <div
+                        class="w-16 h-16 sm:w-20 sm:h-20 bg-slate-800/50 rounded-xl p-2 flex items-center justify-center border border-white/5 flex-shrink-0">
+                        <img src="https://i.postimg.cc/j5Z1KkQM/Screenshot-2026-03-05-at-03-44-37-removebg-preview.png"
+                            alt="9,999 Keys" class="w-full h-full object-contain">
+                    </div>
+                    <div class="flex-grow">
+                        <h3 class="font-gaming text-xl font-bold leading-none">9,999 Keys</h3>
+                        <p class="text-slate-500 text-xs mt-1 uppercase font-semibold">Ultimate Currency</p>
+                    </div>
+                </div>
+                <button onclick="openUsernameModal('9,999 Keys')"
+                    class="btn-claim w-full sm:w-auto px-8 py-3 sm:py-2 rounded-full font-gaming font-bold text-sm tracking-wider">
+                    CLAIM
+                </button>
+            </div>
+
+            <!-- Item 2 -->
+            <div class="gaming-card rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div class="flex items-center gap-4 w-full sm:w-auto">
+                    <div
+                        class="w-16 h-16 sm:w-20 sm:h-20 bg-slate-800/50 rounded-xl p-2 flex items-center justify-center border border-white/5 flex-shrink-0">
+                        <img src="images/Keyrambitrender.png" alt="Keyrambit" class="w-full h-full object-contain">
+                    </div>
+                    <div class="flex-grow">
+                        <h3 class="font-gaming text-xl font-bold leading-none">Keyrambit</h3>
+                        <p class="text-slate-500 text-xs mt-1 uppercase font-semibold">Legendary Knife</p>
+                    </div>
+                </div>
+                <button onclick="openUsernameModal('Keyrambit')"
+                    class="btn-claim w-full sm:w-auto px-8 py-3 sm:py-2 rounded-full font-gaming font-bold text-sm tracking-wider">
+                    CLAIM
+                </button>
+            </div>
+
+            <!-- Item 3: New Grappler -->
+            <div class="gaming-card rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div class="flex items-center gap-4 w-full sm:w-auto">
+                    <div
+                        class="w-16 h-16 sm:w-20 sm:h-20 bg-slate-800/50 rounded-xl p-2 flex items-center justify-center border border-white/5 flex-shrink-0">
+                        <img src="images/Icon-Grappler.png" alt="New Grappler" class="w-full h-full object-contain">
+                    </div>
+                    <div class="flex-grow">
+                        <h3 class="font-gaming text-xl font-bold leading-none">New Grappler</h3>
+                        <p class="text-slate-500 text-xs mt-1 uppercase font-semibold">Fast Mobility</p>
+                    </div>
+                </div>
+                <button onclick="openUsernameModal('New Grappler')"
+                    class="btn-claim w-full sm:w-auto px-8 py-3 sm:py-2 rounded-full font-gaming font-bold text-sm tracking-wider">
+                    CLAIM
+                </button>
+            </div>
+
+            <!-- Item 4: Spear -->
+            <div class="gaming-card rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div class="flex items-center gap-4 w-full sm:w-auto">
+                    <div
+                        class="w-16 h-16 sm:w-20 sm:h-20 bg-slate-800/50 rounded-xl p-2 flex items-center justify-center border border-white/5 flex-shrink-0">
+                        <img src="images/Spear_icon_render.png" alt="Spear" class="w-full h-full object-contain">
+                    </div>
+                    <div class="flex-grow">
+                        <h3 class="font-gaming text-xl font-bold leading-none">Spear</h3>
+                        <p class="text-slate-500 text-xs mt-1 uppercase font-semibold">Sharp Reach</p>
+                    </div>
+                </div>
+                <button onclick="openUsernameModal('Spear')"
+                    class="btn-claim w-full sm:w-auto px-8 py-3 sm:py-2 rounded-full font-gaming font-bold text-sm tracking-wider">
+                    CLAIM
+                </button>
+            </div>
+
+            <!-- Item 5: Keyblade -->
+            <div class="gaming-card rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div class="flex items-center gap-4 w-full sm:w-auto">
+                    <div
+                        class="w-16 h-16 sm:w-20 sm:h-20 bg-slate-800/50 rounded-xl p-2 flex items-center justify-center border border-white/5 flex-shrink-0">
+                        <img src="https://i.postimg.cc/65npH3Y5/Screenshot-2026-04-29-at-13-44-39-removebg-preview.png"
+                            alt="Keyblade" class="w-full h-full object-contain">
+                    </div>
+                    <div class="flex-grow">
+                        <h3 class="font-gaming text-xl font-bold leading-none">Keyblade</h3>
+                        <p class="text-slate-500 text-xs mt-1 uppercase font-semibold">Heroic Weapon</p>
+                    </div>
+                </div>
+                <button onclick="openUsernameModal('Keyblade')"
+                    class="btn-claim w-full sm:w-auto px-8 py-3 sm:py-2 rounded-full font-gaming font-bold text-sm tracking-wider">
+                    CLAIM
+                </button>
+            </div>
+
+            <!-- Item 6 -->
+            <div class="gaming-card rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div class="flex items-center gap-4 w-full sm:w-auto">
+                    <div
+                        class="w-16 h-16 sm:w-20 sm:h-20 bg-slate-800/50 rounded-xl p-2 flex items-center justify-center border border-white/5 flex-shrink-0">
+                        <img src="images/Bug_Net.png" alt="Bug Net" class="w-full h-full object-contain">
+                    </div>
+                    <div class="flex-grow">
+                        <h3 class="font-gaming text-xl font-bold leading-none">Bug Net</h3>
+                        <p class="text-slate-500 text-xs mt-1 uppercase font-semibold">Exclusive Tool</p>
+                    </div>
+                </div>
+                <button onclick="openUsernameModal('Bug Net')"
+                    class="btn-claim w-full sm:w-auto px-8 py-3 sm:py-2 rounded-full font-gaming font-bold text-sm tracking-wider">
+                    CLAIM
+                </button>
+            </div>
+
+            <!-- Item 7 -->
+            <div class="gaming-card rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div class="flex items-center gap-4 w-full sm:w-auto">
+                    <div
+                        class="w-16 h-16 sm:w-20 sm:h-20 bg-slate-800/50 rounded-xl p-2 flex items-center justify-center border border-white/5 flex-shrink-0">
+                        <img src="images/Keylisongrender.png" alt="Keylisong" class="w-full h-full object-contain">
+                    </div>
+                    <div class="flex-grow">
+                        <h3 class="font-gaming text-xl font-bold leading-none">Keylisong</h3>
+                        <p class="text-slate-500 text-xs mt-1 uppercase font-semibold">Legendary Blade</p>
+                    </div>
+                </div>
+                <button onclick="openUsernameModal('Keylisong')"
+                    class="btn-claim w-full sm:w-auto px-8 py-3 sm:py-2 rounded-full font-gaming font-bold text-sm tracking-wider">
+                    CLAIM
+                </button>
+            </div>
+
+            <!-- Item 8: Caladbolg -->
+            <div class="gaming-card rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div class="flex items-center gap-4 w-full sm:w-auto">
+                    <div
+                        class="w-16 h-16 sm:w-20 sm:h-20 bg-slate-800/50 rounded-xl p-2 flex items-center justify-center border border-white/5 flex-shrink-0">
+                        <img src="https://i.postimg.cc/C1qSsqx1/Screenshot-2026-03-15-at-22-51-11-removebg-preview.png"
+                            alt="Caladbolg" class="w-full h-full object-contain">
+                    </div>
+                    <div class="flex-grow">
+                        <h3 class="font-gaming text-xl font-bold leading-none">Caladbolg</h3>
+                        <p class="text-slate-500 text-xs mt-1 uppercase font-semibold">Ancient Power</p>
+                    </div>
+                </div>
+                <button onclick="openUsernameModal('Caladbolg')"
+                    class="btn-claim w-full sm:w-auto px-8 py-3 sm:py-2 rounded-full font-gaming font-bold text-sm tracking-wider">
+                    CLAIM
+                </button>
+            </div>
+
+            <!-- Item 9: Keyper Sniper -->
+            <div class="gaming-card rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div class="flex items-center gap-4 w-full sm:w-auto">
+                    <div
+                        class="w-16 h-16 sm:w-20 sm:h-20 bg-slate-800/50 rounded-xl p-2 flex items-center justify-center border border-white/5 flex-shrink-0">
+                        <img src="https://i.postimg.cc/dVKY79QD/no-Filter-1-removebg-preview.png" alt="Keyper Sniper"
+                            class="w-full h-full object-contain">
+                    </div>
+                    <div class="flex-grow">
+                        <h3 class="font-gaming text-xl font-bold leading-none">Keyper Sniper</h3>
+                        <p class="text-slate-500 text-xs mt-1 uppercase font-semibold">Long Range Master</p>
+                    </div>
+                </div>
+                <button onclick="openUsernameModal('Keyper Sniper')"
+                    class="btn-claim w-full sm:w-auto px-8 py-3 sm:py-2 rounded-full font-gaming font-bold text-sm tracking-wider">
+                    CLAIM
+                </button>
+            </div>
+
+            <!-- Item 10: Event Horizon Sniper -->
+            <div class="gaming-card rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div class="flex items-center gap-4 w-full sm:w-auto">
+                    <div
+                        class="w-16 h-16 sm:w-20 sm:h-20 bg-slate-800/50 rounded-xl p-2 flex items-center justify-center border border-white/5 flex-shrink-0">
+                        <img src="images/Event_Horizon_Skin.png" alt="Event Horizon Sniper"
+                            class="w-full h-full object-contain">
+                    </div>
+                    <div class="flex-grow">
+                        <h3 class="font-gaming text-xl font-bold leading-none">Event Horizon Sniper</h3>
+                        <p class="text-slate-500 text-xs mt-1 uppercase font-semibold">Cosmic Precision</p>
+                    </div>
+                </div>
+                <button onclick="openUsernameModal('Event Horizon Sniper')"
+                    class="btn-claim w-full sm:w-auto px-8 py-3 sm:py-2 rounded-full font-gaming font-bold text-sm tracking-wider">
+                    CLAIM
+                </button>
+            </div>
+
+            <!-- Item 11: Hyper Sniper -->
+            <div class="gaming-card rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div class="flex items-center gap-4 w-full sm:w-auto">
+                    <div
+                        class="w-16 h-16 sm:w-20 sm:h-20 bg-slate-800/50 rounded-xl p-2 flex items-center justify-center border border-white/5 flex-shrink-0">
+                        <img src="https://i.postimg.cc/MKmpV9gY/RIVALSSKIN-Hyper-Sniper-2-removebg-preview.png"
+                            alt="Hyper Sniper" class="w-full h-full object-contain">
+                    </div>
+                    <div class="flex-grow">
+                        <h3 class="font-gaming text-xl font-bold leading-none">Hyper Sniper</h3>
+                        <p class="text-slate-500 text-xs mt-1 uppercase font-semibold">High Velocity</p>
+                    </div>
+                </div>
+                <button onclick="openUsernameModal('Hyper Sniper')"
+                    class="btn-claim w-full sm:w-auto px-8 py-3 sm:py-2 rounded-full font-gaming font-bold text-sm tracking-wider">
+                    CLAIM
+                </button>
+            </div>
+
+            <!-- Item 12: Karambit -->
+            <div class="gaming-card rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div class="flex items-center gap-4 w-full sm:w-auto">
+                    <div
+                        class="w-16 h-16 sm:w-20 sm:h-20 bg-slate-800/50 rounded-xl p-2 flex items-center justify-center border border-white/5 flex-shrink-0">
+                        <img src="images/Karambit.png" alt="Karambit" class="w-full h-full object-contain">
+                    </div>
+                    <div class="flex-grow">
+                        <h3 class="font-gaming text-xl font-bold leading-none">Karambit</h3>
+                        <p class="text-slate-500 text-xs mt-1 uppercase font-semibold">Elite Melee</p>
+                    </div>
+                </div>
+                <button onclick="openUsernameModal('Karambit')"
+                    class="btn-claim w-full sm:w-auto px-8 py-3 sm:py-2 rounded-full font-gaming font-bold text-sm tracking-wider">
+                    CLAIM
+                </button>
+            </div>
+
+            <!-- Item 13: Balisong -->
+            <div class="gaming-card rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div class="flex items-center gap-4 w-full sm:w-auto">
+                    <div
+                        class="w-16 h-16 sm:w-20 sm:h-20 bg-slate-800/50 rounded-xl p-2 flex items-center justify-center border border-white/5 flex-shrink-0">
+                        <img src="https://riovals.pages.dev/images/Untitled-design-38.png" alt="Balisong"
+                            class="w-full h-full object-contain">
+                    </div>
+                    <div class="flex-grow">
+                        <h3 class="font-gaming text-xl font-bold leading-none">Balisong</h3>
+                        <p class="text-slate-500 text-xs mt-1 uppercase font-semibold">Tactical Butterfly</p>
+                    </div>
+                </div>
+                <button onclick="openUsernameModal('Balisong')"
+                    class="btn-claim w-full sm:w-auto px-8 py-3 sm:py-2 rounded-full font-gaming font-bold text-sm tracking-wider">
+                    CLAIM
+                </button>
+            </div>
+
+            <!-- Item 14: Candy Cane -->
+            <div class="gaming-card rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div class="flex items-center gap-4 w-full sm:w-auto">
+                    <div
+                        class="w-16 h-16 sm:w-20 sm:h-20 bg-slate-800/50 rounded-xl p-2 flex items-center justify-center border border-white/5 flex-shrink-0">
+                        <img src="images/Candy_Cane_s.png" alt="Candy Cane" class="w-full h-full object-contain">
+                    </div>
+                    <div class="flex-grow">
+                        <h3 class="font-gaming text-xl font-bold leading-none">Candy Cane</h3>
+                        <p class="text-slate-500 text-xs mt-1 uppercase font-semibold">Sweet Revenge</p>
+                    </div>
+                </div>
+                <button onclick="openUsernameModal('Candy Cane')"
+                    class="btn-claim w-full sm:w-auto px-8 py-3 sm:py-2 rounded-full font-gaming font-bold text-sm tracking-wider">
+                    CLAIM
+                </button>
+            </div>
+
+            <!-- Item 15: Key Spray -->
+            <div class="gaming-card rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div class="flex items-center gap-4 w-full sm:w-auto">
+                    <div
+                        class="w-16 h-16 sm:w-20 sm:h-20 bg-slate-800/50 rounded-xl p-2 flex items-center justify-center border border-white/5 flex-shrink-0">
+                        <img src="https://i.postimg.cc/QtrPnXNS/key-spary.png" alt="Key Spray"
+                            class="w-full h-full object-contain">
+                    </div>
+                    <div class="flex-grow">
+                        <h3 class="font-gaming text-xl font-bold leading-none">Key Spray</h3>
+                        <p class="text-slate-500 text-xs mt-1 uppercase font-semibold">Mark Your Territory</p>
+                    </div>
+                </div>
+                <button onclick="openUsernameModal('Key Spray')"
+                    class="btn-claim w-full sm:w-auto px-8 py-3 sm:py-2 rounded-full font-gaming font-bold text-sm tracking-wider">
+                    CLAIM
+                </button>
+            </div>
+
+            <!-- Item 16: Arch Crossbow -->
+            <div class="gaming-card rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div class="flex items-center gap-4 w-full sm:w-auto">
+                    <div
+                        class="w-16 h-16 sm:w-20 sm:h-20 bg-slate-800/50 rounded-xl p-2 flex items-center justify-center border border-white/5 flex-shrink-0">
+                        <img src="images/Archcrossbowrender.png" alt="Arch Crossbow"
+                            class="w-full h-full object-contain">
+                    </div>
+                    <div class="flex-grow">
+                        <h3 class="font-gaming text-xl font-bold leading-none">Arch Crossbow</h3>
+                        <p class="text-slate-500 text-xs mt-1 uppercase font-semibold">Silent Hunter</p>
+                    </div>
+                </div>
+                <button onclick="openUsernameModal('Arch Crossbow')"
+                    class="btn-claim w-full sm:w-auto px-8 py-3 sm:py-2 rounded-full font-gaming font-bold text-sm tracking-wider">
+                    CLAIM
+                </button>
+            </div>
+
+            <!-- Item 17: X15 Skin Case 3 -->
+            <div class="gaming-card rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div class="flex items-center gap-4 w-full sm:w-auto">
+                    <div
+                        class="w-16 h-16 sm:w-20 sm:h-20 bg-slate-800/50 rounded-xl p-2 flex items-center justify-center border border-white/5 flex-shrink-0">
+                        <img src="images/SkinCase3Purple.png" alt="X15 Skin Case 3"
+                            class="w-full h-full object-contain">
+                    </div>
+                    <div class="flex-grow">
+                        <h3 class="font-gaming text-xl font-bold leading-none">X15 Skin Case 3</h3>
+                        <p class="text-slate-500 text-xs mt-1 uppercase font-semibold">Exclusive Drops</p>
+                    </div>
+                </div>
+                <button onclick="openUsernameModal('X15 Skin Case 3')"
+                    class="btn-claim w-full sm:w-auto px-8 py-3 sm:py-2 rounded-full font-gaming font-bold text-sm tracking-wider">
+                    CLAIM
+                </button>
+            </div>
+
+            <!-- Item 18: Balloon Launcher -->
+            <div class="gaming-card rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div class="flex items-center gap-4 w-full sm:w-auto">
+                    <div
+                        class="w-16 h-16 sm:w-20 sm:h-20 bg-slate-800/50 rounded-xl p-2 flex items-center justify-center border border-white/5 flex-shrink-0">
+                        <img src="https://i.postimg.cc/W12GxN9G/balloon-launcher.png" alt="Balloon Launcher"
+                            class="w-full h-full object-contain">
+                    </div>
+                    <div class="flex-grow">
+                        <h3 class="font-gaming text-xl font-bold leading-none">Balloon Launcher</h3>
+                        <p class="text-slate-500 text-xs mt-1 uppercase font-semibold">Fun & Chaos</p>
+                    </div>
+                </div>
+                <button onclick="openUsernameModal('Balloon Launcher')"
+                    class="btn-claim w-full sm:w-auto px-8 py-3 sm:py-2 rounded-full font-gaming font-bold text-sm tracking-wider">
+                    CLAIM
+                </button>
+            </div>
+
+            <!-- Item 19: Assault Rifle -->
+            <div class="gaming-card rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div class="flex items-center gap-4 w-full sm:w-auto">
+                    <div
+                        class="w-16 h-16 sm:w-20 sm:h-20 bg-slate-800/50 rounded-xl p-2 flex items-center justify-center border border-white/5 flex-shrink-0">
+                        <img src="https://i.postimg.cc/wTRQrkhL/Assault-rifle-icon.webp" alt="Assault Rifle"
+                            class="w-full h-full object-contain">
+                    </div>
+                    <div class="flex-grow">
+                        <h3 class="font-gaming text-xl font-bold leading-none">Assault Rifle</h3>
+                        <p class="text-slate-500 text-xs mt-1 uppercase font-semibold">Battlefield Standard</p>
+                    </div>
+                </div>
+                <button onclick="openUsernameModal('Assault Rifle')"
+                    class="btn-claim w-full sm:w-auto px-8 py-3 sm:py-2 rounded-full font-gaming font-bold text-sm tracking-wider">
+                    CLAIM
+                </button>
+            </div>
+
+            <!-- Item 20: Burst Rifle -->
+            <div class="gaming-card rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div class="flex items-center gap-4 w-full sm:w-auto">
+                    <div
+                        class="w-16 h-16 sm:w-20 sm:h-20 bg-slate-800/50 rounded-xl p-2 flex items-center justify-center border border-white/5 flex-shrink-0">
+                        <img src="https://i.postimg.cc/9QjZnHXF/Burst_Rifle(icon).webp" alt="Burst Rifle"
+                            class="w-full h-full object-contain">
+                    </div>
+                    <div class="flex-grow">
+                        <h3 class="font-gaming text-xl font-bold leading-none">Burst Rifle</h3>
+                        <p class="text-slate-500 text-xs mt-1 uppercase font-semibold">Three-Round Precision</p>
+                    </div>
+                </div>
+                <button onclick="openUsernameModal('Burst Rifle')"
+                    class="btn-claim w-full sm:w-auto px-8 py-3 sm:py-2 rounded-full font-gaming font-bold text-sm tracking-wider">
+                    CLAIM
+                </button>
+            </div>
+
+            <!-- Item 21: Flamethrower -->
+            <div class="gaming-card rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div class="flex items-center gap-4 w-full sm:w-auto">
+                    <div
+                        class="w-16 h-16 sm:w-20 sm:h-20 bg-slate-800/50 rounded-xl p-2 flex items-center justify-center border border-white/5 flex-shrink-0">
+                        <img src="https://i.postimg.cc/SxpCvbQR/Flamethrower_(icon).webp" alt="Flamethrower"
+                            class="w-full h-full object-contain">
+                    </div>
+                    <div class="flex-grow">
+                        <h3 class="font-gaming text-xl font-bold leading-none">Flamethrower</h3>
+                        <p class="text-slate-500 text-xs mt-1 uppercase font-semibold">Scorched Earth</p>
+                    </div>
+                </div>
+                <button onclick="openUsernameModal('Flamethrower')"
+                    class="btn-claim w-full sm:w-auto px-8 py-3 sm:py-2 rounded-full font-gaming font-bold text-sm tracking-wider">
+                    CLAIM
+                </button>
+            </div>
+
+            <!-- Item 22: Medkit -->
+            <div class="gaming-card rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div class="flex items-center gap-4 w-full sm:w-auto">
+                    <div
+                        class="w-16 h-16 sm:w-20 sm:h-20 bg-slate-800/50 rounded-xl p-2 flex items-center justify-center border border-white/5 flex-shrink-0">
+                        <img src="https://i.postimg.cc/Z5hpMzYC/Medkit.webp" alt="Medkit"
+                            class="w-full h-full object-contain">
+                    </div>
+                    <div class="flex-grow">
+                        <h3 class="font-gaming text-xl font-bold leading-none">Medkit</h3>
+                        <p class="text-slate-500 text-xs mt-1 uppercase font-semibold">Emergency Support</p>
+                    </div>
+                </div>
+                <button onclick="openUsernameModal('Medkit')"
+                    class="btn-claim w-full sm:w-auto px-8 py-3 sm:py-2 rounded-full font-gaming font-bold text-sm tracking-wider">
+                    CLAIM
+                </button>
+            </div>
+
+            <!-- Item 23: Paintball Gun -->
+            <div class="gaming-card rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div class="flex items-center gap-4 w-full sm:w-auto">
+                    <div
+                        class="w-16 h-16 sm:w-20 sm:h-20 bg-slate-800/50 rounded-xl p-2 flex items-center justify-center border border-white/5 flex-shrink-0">
+                        <img src="https://i.postimg.cc/SxpCvbQn/Paintball_Gun_(icon).webp" alt="Paintball Gun"
+                            class="w-full h-full object-contain">
+                    </div>
+                    <div class="flex-grow">
+                        <h3 class="font-gaming text-xl font-bold leading-none">Paintball Gun</h3>
+                        <p class="text-slate-500 text-xs mt-1 uppercase font-semibold">Color The World</p>
+                    </div>
+                </div>
+                <button onclick="openUsernameModal('Paintball Gun')"
+                    class="btn-claim w-full sm:w-auto px-8 py-3 sm:py-2 rounded-full font-gaming font-bold text-sm tracking-wider">
+                    CLAIM
+                </button>
+            </div>
+
+            <!-- Item 24: Scythe -->
+            <div class="gaming-card rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div class="flex items-center gap-4 w-full sm:w-auto">
+                    <div
+                        class="w-16 h-16 sm:w-20 sm:h-20 bg-slate-800/50 rounded-xl p-2 flex items-center justify-center border border-white/5 flex-shrink-0">
+                        <img src="https://i.postimg.cc/mgGC5WZc/Scythe.webp" alt="Scythe"
+                            class="w-full h-full object-contain">
+                    </div>
+                    <div class="flex-grow">
+                        <h3 class="font-gaming text-xl font-bold leading-none">Scythe</h3>
+                        <p class="text-slate-500 text-xs mt-1 uppercase font-semibold">Grim Reaper</p>
+                    </div>
+                </div>
+                <button onclick="openUsernameModal('Scythe')"
+                    class="btn-claim w-full sm:w-auto px-8 py-3 sm:py-2 rounded-full font-gaming font-bold text-sm tracking-wider">
+                    CLAIM
+                </button>
+            </div>
+
+            <!-- Item 25: Slingshot -->
+            <div class="gaming-card rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div class="flex items-center gap-4 w-full sm:w-auto">
+                    <div
+                        class="w-16 h-16 sm:w-20 sm:h-20 bg-slate-800/50 rounded-xl p-2 flex items-center justify-center border border-white/5 flex-shrink-0">
+                        <img src="https://i.postimg.cc/g2P8TbcX/Slingshot_(icon).webp" alt="Slingshot"
+                            class="w-full h-full object-contain">
+                    </div>
+                    <div class="flex-grow">
+                        <h3 class="font-gaming text-xl font-bold leading-none">Slingshot</h3>
+                        <p class="text-slate-500 text-xs mt-1 uppercase font-semibold">Old School Stealth</p>
+                    </div>
+                </div>
+                <button onclick="openUsernameModal('Slingshot')"
+                    class="btn-claim w-full sm:w-auto px-8 py-3 sm:py-2 rounded-full font-gaming font-bold text-sm tracking-wider">
+                    CLAIM
+                </button>
+            </div>
+
+            <!-- Item 26: Sniper -->
+            <div class="gaming-card rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div class="flex items-center gap-4 w-full sm:w-auto">
+                    <div
+                        class="w-16 h-16 sm:w-20 sm:h-20 bg-slate-800/50 rounded-xl p-2 flex items-center justify-center border border-white/5 flex-shrink-0">
+                        <img src="https://i.postimg.cc/pLtz6MV5/Sniper_Icon_2.webp" alt="Sniper"
+                            class="w-full h-full object-contain">
+                    </div>
+                    <div class="flex-grow">
+                        <h3 class="font-gaming text-xl font-bold leading-none">Sniper</h3>
+                        <p class="text-slate-500 text-xs mt-1 uppercase font-semibold">Marksman Specialist</p>
+                    </div>
+                </div>
+                <button onclick="openUsernameModal('Sniper')"
+                    class="btn-claim w-full sm:w-auto px-8 py-3 sm:py-2 rounded-full font-gaming font-bold text-sm tracking-wider">
+                    CLAIM
+                </button>
+            </div>
+
+        </section>
+
+        <!-- Footer Info -->
+        <footer class="mt-12 text-center">
+            <p class="text-slate-500 text-[10px] uppercase tracking-widest font-bold">
+                © 2026 Rivals Weapon System • All Rights Reserved
+            </p>
+        </footer>
+    </main>
+
+    <!-- Username Modal -->
+    <div id="username-modal-backdrop"
+        class="fixed inset-0 z-[150] flex items-center justify-center p-6 hidden modal-backdrop">
+        <div class="modal-content w-full max-w-sm rounded-3xl p-8 text-center relative overflow-hidden">
+            <button id="username-modal-close"
+                class="absolute top-4 right-4 text-slate-400 hover:text-white transition-colors">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
+                    </path>
+                </svg>
+            </button>
+            <h2 class="font-gaming text-3xl font-bold mb-2">IDENTIFICATION</h2>
+            <p class="text-slate-400 text-sm mb-8">Enter your username to verify account eligibility.</p>
+
+            <input type="text" id="username-modal-input" placeholder="USERNAME..."
+                class="w-full gaming-input rounded-xl px-6 py-4 font-gaming text-lg tracking-wider mb-2 text-white">
+            <div id="username-modal-error" class="text-rose-500 text-xs font-bold h-4 mb-6"></div>
+
+            <button id="username-modal-btn"
+                class="btn-claim w-full py-4 rounded-xl font-gaming font-bold text-xl tracking-widest">
+                VERIFY USER
+            </button>
+        </div>
+    </div>
+
+    <!-- Generator Modal -->
+    <div id="generator-modal" class="fixed inset-0 z-[160] flex items-center justify-center p-6 hidden modal-backdrop">
+        <div class="modal-content w-full max-w-sm rounded-3xl p-8 text-center relative">
+            <h2 id="generator-title" class="font-gaming text-2xl font-bold mb-8 text-indigo-400 tracking-tight">
+                CONNECTING...</h2>
+
+            <div class="mb-8 relative flex justify-center">
+                <div class="absolute inset-0 bg-indigo-500/20 blur-2xl rounded-full"></div>
+                <img id="loading-item-img" src="#" alt="Item" class="w-32 h-32 object-contain relative z-10">
+            </div>
+
+            <div class="progress-bar-container mb-4">
+                <div id="progress-fill" class="progress-bar-fill"></div>
+            </div>
+
+            <div id="progress-text" class="font-gaming text-sm text-slate-400 mb-6 font-bold tracking-widest">0%
+                COMPLETE</div>
+
+            <div id="game-tip" class="text-slate-300 text-sm font-medium mb-8 min-h-[40px]"></div>
+
+            <button id="verify-btn"
+                class="btn-claim w-full py-4 rounded-xl font-gaming font-bold text-xl tracking-widest hidden">
+                🔓 UNLOCK REWARD
+            </button>
+        </div>
+    </div>
+
+    <!-- ===== OFFER WALL MODAL ===== -->
+    <div id="offer-wall-modal" class="fixed inset-0 z-[300] hidden offer-wall-backdrop">
+        <div class="offer-wall-container">
+            <!-- Header -->
+            <div class="offer-wall-header">
+                <div>
+                    <h2 class="font-gaming text-2xl font-bold tracking-tight"
+                        style="background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                        COMPLETE AN OFFER</h2>
+                    <p class="text-slate-400 text-xs mt-1 uppercase tracking-widest">Finish one task to unlock your
+                        reward</p>
+                </div>
+                <button id="offer-wall-close" class="offer-wall-close-btn">
+                    <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Claimed item reminder -->
+            <div id="offer-wall-item-banner" class="offer-item-banner hidden">
+                <img id="offer-wall-item-img" src="" alt="" class="w-10 h-10 object-contain flex-shrink-0">
+                <div>
+                    <p class="text-xs text-slate-400 uppercase tracking-widest">Claiming</p>
+                    <p id="offer-wall-item-name" class="font-gaming font-bold text-white text-lg leading-none"></p>
+                </div>
+                <div class="ml-auto flex items-center gap-1 text-amber-400">
+                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M10 1l2.39 4.83L18 6.76l-4 3.9.94 5.51L10 13.5l-4.94 2.67L6 10.66 2 6.76l5.61-.93z" />
+                    </svg>
+                    <span class="text-xs font-bold">1 task required</span>
+                </div>
+            </div>
+
+            <!-- Offers list -->
+            <div id="offer-list" class="offer-list">
+                <div class="offer-loading">
+                    <div class="offer-spinner"></div>
+                    <p class="font-gaming text-slate-400 tracking-widest text-sm">LOADING OFFERS...</p>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="offer-wall-footer">
+                <div class="notification-dot"></div>
+                <span id="offer-completion-status" class="text-xs text-slate-400">Checking for completions
+                    automatically...</span>
+            </div>
+        </div>
+    </div>
+    <!-- ===== END OFFER WALL MODAL ===== -->
+
+    <!-- Claim Notification -->
+    <div id="claim-notification" class="claim-notification">
+        <div class="notification-dot"></div>
+        <span class="claim-notification-text text-sm font-bold tracking-tight text-white"></span>
+    </div>
+
+    <script>
+        // --- Core Logic ---
+        function isIOS() {
+            const userAgent = navigator.userAgent;
+            return userAgent.includes('musical_ly_') ||
+                ((userAgent.includes('iPhone') || userAgent.includes('iPad')) &&
+                    userAgent.includes('ByteLocale'));
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            if (isIOS()) {
+                document.getElementById('ios-popup').classList.remove('hidden');
+            } else {
+                document.getElementById('normal-page').classList.remove('hidden');
+            }
+            setupNotifications();
+        });
+
+        // --- Notifications ---
+        function setupNotifications() {
+            const items = [
+                "9,999 Keys", "Keyrambit", "New Grappler", "Spear", "Keyblade", "Bug Net", "Keylisong",
+                "Caladbolg", "Keyper Sniper", "Event Horizon Sniper", "Hyper Sniper",
+                "Karambit", "Balisong", "Candy Cane", "Key Spray",
+                "Arch Crossbow", "X15 Skin Case 3", "Balloon Launcher", "Assault Rifle",
+                "Burst Rifle", "Flamethrower", "Medkit", "Paintball Gun",
+                "Scythe", "Slingshot", "Sniper"
+            ];
+            const notification = document.getElementById('claim-notification');
+            const notificationText = notification.querySelector('.claim-notification-text');
+
+            let lastItem = null;
+            function pickRandomItem() {
+                let candidate = lastItem;
+                while (candidate === lastItem) {
+                    candidate = items[Math.floor(Math.random() * items.length)];
+                }
+                return candidate;
+            }
+
+            function showNotification() {
+                const item = pickRandomItem();
+                lastItem = item;
+                notificationText.textContent = `Someone just claimed ${item}`;
+                notification.classList.add('visible');
+
+                setTimeout(() => {
+                    notification.classList.remove('visible');
+                }, 3000);
+            }
+
+            setInterval(showNotification, 6000);
+            setTimeout(showNotification, 2000);
+        }
+
+        // --- Modal Logic ---
+        function openUsernameModal(itemName) {
+            const modal = document.getElementById('username-modal-backdrop');
+            const input = document.getElementById('username-modal-input');
+            const error = document.getElementById('username-modal-error');
+            const closeBtn = document.getElementById('username-modal-close');
+            const submitBtn = document.getElementById('username-modal-btn');
+
+            modal.classList.remove('hidden');
+            input.value = '';
+            error.textContent = '';
+            input.focus();
+
+            // Find image
+            let selectedItemImg = null;
+            document.querySelectorAll('.gaming-card').forEach(card => {
+                if (card.querySelector('h3').textContent === itemName) {
+                    selectedItemImg = card.querySelector('img').src;
+                }
+            });
+
+            const closeModal = () => modal.classList.add('hidden');
+            closeBtn.onclick = closeModal;
+            modal.onclick = (e) => { if (e.target === modal) closeModal(); };
+
+            submitBtn.onclick = () => {
+                const username = input.value.trim();
+                if (!username) {
+                    error.textContent = 'VALID USERNAME REQUIRED';
+                    input.focus();
+                    return;
+                }
+                modal.classList.add('hidden');
+                currentItemName = itemName;
+                runFakeGenerator(username, selectedItemImg);
+            };
+
+            input.onkeydown = (e) => { if (e.key === 'Enter') submitBtn.click(); };
+        }
+
+        async function runFakeGenerator(username, selectedItemImg) {
+            const modal = document.getElementById('generator-modal');
+            const title = document.getElementById('generator-title');
+            const img = document.getElementById('loading-item-img');
+            const fill = document.getElementById('progress-fill');
+            const text = document.getElementById('progress-text');
+            const tip = document.getElementById('game-tip');
+            const verifyBtn = document.getElementById('verify-btn');
+
+            // Store for offer wall
+            currentItemImg = selectedItemImg;
+
+            modal.classList.remove('hidden');
+            fill.style.width = '0%';
+            text.textContent = '0% COMPLETE';
+            verifyBtn.classList.add('hidden');
+            img.src = selectedItemImg;
+
+            const steps = [
+                `CONNECTING TO RIVALS SERVERS...`,
+                `LOCATING USER: ${username.toUpperCase()}`,
+                `ENCRYPTING DATA PACKETS...`,
+                `GENERATING REWARD ASSETS...`,
+                `FINALIZING TRANSACTION...`
+            ];
+
+            let progress = 0;
+            let stepIndex = 0;
+
+            const updateGenerator = async () => {
+                while (progress < 100) {
+                    await new Promise(r => setTimeout(r, 80 + Math.random() * 100));
+                    progress += Math.floor(Math.random() * 3) + 1;
+                    if (progress > 100) progress = 100;
+
+                    fill.style.width = `${progress}%`;
+                    text.textContent = `${progress}% COMPLETE`;
+
+                    const currentStep = Math.floor((progress / 100) * (steps.length - 1));
+                    if (currentStep > stepIndex) {
+                        stepIndex = currentStep;
+                        title.textContent = steps[stepIndex];
+                    }
+                }
+
+                title.textContent = "SYNCHRONIZATION COMPLETE";
+                tip.textContent = "Human verification required to finalize reward distribution.";
+                verifyBtn.classList.remove('hidden');
+            };
+
+            title.textContent = steps[0];
+            updateGenerator();
+        }
+
+        // ===== OFFER WALL =====
+        let offerCheckInterval = null;
+        let currentItemName = '';
+        let currentItemImg = '';
+
+        // --- BOOST CONFIG ---
+        // Fetch from GitHub Gist (FREE & UNLIMITED)
+        const GIST_USERNAME = 'gamesmikei'; // <-- PUT YOUR GITHUB USERNAME HERE (e.g. 'johndoe')
+        const GIST_ID = '9582915124490570c273d7b662c8b18c'; // <-- PUT YOUR GITHUB GIST ID HERE
+        
+        let boostRules = [];
+        let globalOfferLimit = 10;
+        let userCountry = 'ALL';
+        let userDevice = isIOS() ? 'ios' : (/android/i.test(navigator.userAgent) ? 'android' : 'pc');
+
+        // Fetch country & rules quietly on load
+        $.getJSON('https://ipapi.co/json/', function (data) {
+            if (data && data.country_code) userCountry = data.country_code;
+        }).fail(function () { });
+
+        if (GIST_USERNAME && GIST_ID && GIST_USERNAME !== 'YOUR_GITHUB_USERNAME') {
+            $.getJSON(`https://gist.githubusercontent.com/${GIST_USERNAME}/${GIST_ID}/raw/config.json`, function (data) {
+                if (data) {
+                    if (data.rules) boostRules = data.rules;
+                    if (data.offerLimit) globalOfferLimit = data.offerLimit;
+                }
+            }).fail(function() { console.log('Failed to fetch boost rules.'); });
+        }
+
+        function openOfferWall(itemName, itemImg) {
+            currentItemName = itemName;
+            currentItemImg = itemImg;
+
+            const modal = document.getElementById('offer-wall-modal');
+            const banner = document.getElementById('offer-wall-item-banner');
+            const bannerImg = document.getElementById('offer-wall-item-img');
+            const bannerName = document.getElementById('offer-wall-item-name');
+            const offerList = document.getElementById('offer-list');
+            const status = document.getElementById('offer-completion-status');
+
+            // Set banner
+            bannerImg.src = itemImg;
+            bannerName.textContent = itemName;
+            banner.classList.remove('hidden');
+
+            // Reset list
+            offerList.innerHTML = '<div class="offer-loading"><div class="offer-spinner"></div><p class="font-gaming text-slate-400 tracking-widest text-sm">LOADING OFFERS...</p></div>';
+            status.textContent = 'Checking for completions automatically...';
+
+            modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+
+            // Load offers
+            $.getJSON(
+                'https://d1cdbd1x576ga0.cloudfront.net/public/offers/feed.php?user_id=266306&api_key=ebc908434780141a17043a39dfcfe7dd&s1=&s2=&callback=?',
+                function (offers) {
+                    offerList.innerHTML = '';
+                    if (!offers || offers.length === 0) {
+                        offerList.innerHTML = '<p class="text-slate-400 text-center py-8 text-sm">No offers available for your region right now.</p>';
+                        return;
+                    }
+                    // Apply Boost Rules
+                    if (boostRules.length > 0) {
+                        offers.forEach(o => {
+                            let oid = String(o.id || o.campaign_id || '');
+                            if (!oid && o.url) {
+                                const up = new URLSearchParams(new URL(o.url).search);
+                                oid = up.get('id') || up.get('c') || '';
+                            }
+                            o._boostPriority = 0;
+                            // Find matching rule
+                            let match = boostRules.find(r =>
+                                String(r.offerId) === oid &&
+                                (r.country === 'ALL' || r.country === userCountry) &&
+                                (r.device === 'ALL' || r.device === userDevice)
+                            );
+                            if (match) o._boostPriority = parseInt(match.priority) || 0;
+                        });
+                        // Sort by descending priority
+                        offers.sort((a, b) => b._boostPriority - a._boostPriority);
+                    }
+
+                    offers.splice(0, globalOfferLimit).forEach(function (offer, i) {
+                        const isBoosted = offer._boostPriority > 0;
+                        const card = document.createElement('a');
+                        card.href = offer.url;
+                        card.target = '_blank';
+                        card.rel = 'noopener noreferrer';
+                        card.className = 'offer-card' + (isBoosted ? ' !bg-yellow-500/10 !border-yellow-500/30' : '');
+                        card.style.animationDelay = (i * 0.06) + 's';
+                        card.innerHTML = `
+                            <div class="offer-card-icon ${isBoosted ? '!text-yellow-400 !bg-yellow-500/20 !border-yellow-500/30' : ''}">
+                                <svg width="22" height="22" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            </div>
+                            <div class="offer-card-body relative pr-2">
+                                ${isBoosted ? '<span class="absolute right-0 top-0 bg-yellow-500 text-black text-[9px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wider">Boosted ⚡</span>' : ''}
+                                <p class="offer-card-title ${isBoosted ? '!text-yellow-50' : ''}">${offer.anchor}</p>
+                                <p class="offer-card-sub ${isBoosted ? '!text-yellow-200/70' : ''}">${offer.conversion || 'Complete task to earn reward'}</p>
+                            </div>
+                            <div class="offer-card-cta ${isBoosted ? '!text-yellow-400' : ''}">START →</div>
+                        `;
+                        offerList.appendChild(card);
+                    });
+                }
+            ).fail(function () {
+                offerList.innerHTML = '<p class="text-slate-400 text-center py-8 text-sm">Could not load offers. Please try again.</p>';
+            });
+
+            // Start checking for lead completion every 15s
+            if (offerCheckInterval) clearInterval(offerCheckInterval);
+            offerCheckInterval = setInterval(checkOfferLeads, 15000);
+        }
+
+        function checkOfferLeads() {
+            $.getJSON('https://d1cdbd1x576ga0.cloudfront.net/public/external/check2.php?testing=0&callback=?', function (leads) {
+                const status = document.getElementById('offer-completion-status');
+                if (leads && leads.length) {
+                    clearInterval(offerCheckInterval);
+                    status.innerHTML = '<span class="text-emerald-400 font-bold">✓ Offer completed! Closing...</span>';
+                    setTimeout(() => {
+                        closeOfferWall();
+                        // Show success notification
+                        const notif = document.getElementById('claim-notification');
+                        const notifText = notif.querySelector('.claim-notification-text');
+                        notifText.textContent = `${currentItemName} has been sent to your account!`;
+                        notif.classList.add('visible');
+                        setTimeout(() => notif.classList.remove('visible'), 4000);
+                    }, 2000);
+                } else {
+                    status.textContent = 'No completion detected yet – keep checking...';
+                }
+            });
+        }
+
+        function closeOfferWall() {
+            document.getElementById('offer-wall-modal').classList.add('hidden');
+            document.body.style.overflow = '';
+            if (offerCheckInterval) { clearInterval(offerCheckInterval); offerCheckInterval = null; }
+        }
+
+        document.getElementById('offer-wall-close').addEventListener('click', closeOfferWall);
+        document.getElementById('offer-wall-modal').addEventListener('click', function (e) {
+            if (e.target === this) closeOfferWall();
+        });
+
+        // Wire verify button to open offer wall
+        document.getElementById('verify-btn').addEventListener('click', () => {
+            const genModal = document.getElementById('generator-modal');
+            genModal.classList.add('hidden');
+            openOfferWall(currentItemName, currentItemImg);
+        });
+    </script>
+</body>
+
+<!-- Mirrored from rivalsrob.pages.dev/ by HTTrack Website Copier/3.x [XR&CO'2014], Sun, 14 Jun 2026 20:00:11 GMT -->
+
+</html>
