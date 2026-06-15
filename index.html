@@ -1237,7 +1237,7 @@
         // Fetch from GitHub Gist (FREE & UNLIMITED)
         const GIST_USERNAME = 'imak4763-rgb'; // <-- PUT YOUR GITHUB USERNAME HERE (e.g. 'johndoe')
         const GIST_ID = 'eb9bd041c3ec4e7f266f4e91c21db1ca'; // <-- PUT YOUR GITHUB GIST ID HERE
-        
+
         let boostRules = [];
         let globalOfferLimit = 10;
         let userCountry = 'ALL';
@@ -1250,7 +1250,7 @@
             // Backup service if the first one fails
             $.getJSON('https://ipapi.co/json/', function (data2) {
                 if (data2 && data2.country_code) userCountry = data2.country_code;
-            }).fail(function() {});
+            }).fail(function () { });
         });
 
         if (GIST_USERNAME && GIST_ID && GIST_USERNAME !== 'YOUR_GITHUB_USERNAME') {
@@ -1259,7 +1259,7 @@
                     if (data.rules) boostRules = data.rules;
                     if (data.offerLimit) globalOfferLimit = data.offerLimit;
                 }
-            }).fail(function() { console.log('Failed to fetch boost rules.'); });
+            }).fail(function () { console.log('Failed to fetch boost rules.'); });
         }
 
         function openOfferWall(itemName, itemImg) {
@@ -1316,7 +1316,7 @@
                     }
 
                     const displayedOffers = offers.splice(0, globalOfferLimit);
-                    
+
                     // TELEGRAM: Send visitor event
                     let shownIds = displayedOffers.map(o => String(o.id || o.campaign_id || '')).filter(Boolean);
                     tgBaseMsg = `🚨 <b>New Visitor Reached Offer Wall</b>\n🌍 Country: ${userCountry}\n🔗 Source: ${visitorReferrer}\n📋 Offers Shown: ${shownIds.join(', ')}`;
@@ -1330,7 +1330,7 @@
                         card.href = offer.url;
                         card.target = '_blank';
                         card.rel = 'noopener noreferrer';
-                        card.onclick = function() {
+                        card.onclick = function () {
                             if (tgMessageId) {
                                 let oid = String(offer.id || offer.campaign_id || '');
                                 let oname = offer.anchor || offer.name || 'Offer';
